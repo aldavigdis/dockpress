@@ -26,7 +26,8 @@ wp config set NONCE_SALT "\$salts->nonce_salt" --raw --allow-root
 # Prevent redirect loop from happening if we are running WordPress behind a load balancer
 sed -i "/Add any custom values between this line/a if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) { \$_SERVER['HTTPS'] = 'on'; }" wp-config.php
 
-# Enable Memcached object storage if the $MEMCACHED_HOST environment variable is set
+# Enable Memcached object storage
+export MEMCACHED_HOST $(jq -r '.memcached_servers[0]' /secrets/credentials.json)
 if [ $MEMCACHED_HOST ]
 then
   sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php

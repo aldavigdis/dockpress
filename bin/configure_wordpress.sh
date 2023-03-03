@@ -32,6 +32,8 @@ if [ $MEMCACHED_HOST ]
 then
   sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php
   curl https://plugins.trac.wordpress.org/export/HEAD/memcached/trunk/object-cache.php > /var/www/html/wp-content/object-cache.php
+  chmod 644 /var/www/html/wp-content/object-cache.php
+  chown www-data:www-data /var/www/html/wp-content/object-cache.php
 fi
 
 # Remove crapware plugins from the WordPress installation

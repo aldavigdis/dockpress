@@ -10,6 +10,9 @@ development by placing your WP site in the `wordpress_site` directory and
 committing it to the codebase; plugins, themes and all by running
 `git add wordpress_site/*`.
 
+This enables the site to be baked into the Docker image when you build and
+deploy it.
+
 ## Features
 
 * Runs PHP-FPM 8.1 behind Nginx (as opposed to the legacy apache mod_php of doing things)

@@ -5,6 +5,11 @@ run in a cluster or a swarm in the cloud. It can also run as a development
 environment where PHP-FPM, Nginx, Memcached and New Relic need to be accounted
 for.
 
+You can fork this codebase and use it as the basis of your own WordPress
+development by placing your WP site in the `wordpress_site` directory and
+committing it to the codebase; plugins, themes and all by running
+`git add wordpress_site/*`.
+
 ## Features
 
 * Runs PHP-FPM 8.1 behind Nginx (as opposed to the legacy apache mod_php of doing things)

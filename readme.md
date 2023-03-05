@@ -66,9 +66,28 @@ The source code of the WordPress site is assumed to reside in the
 `wordpress_site/` directory. In case there is no index.php file in there, a
 fresh installation is made using WP-CLI.
 
+Regardless, it is recommended to download WordPress into `wordpress_site/`,
+even if you want to start at a blank slate and adjusting the file permissions
+and ownership in there before building the Docker image.
+
+Assuming you have WP-CLI installed:
+
+```bash
+cd wordpress_site
+wp core download
+chown -R www-data:www-data .
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+cd ..
+docker build -t dockpress . -f Dockerfile
+```
+
+You can set the NUKE_FILE_PERMISSIONS environment variable in the Dockerfile to
+reset the file permissions and ownership.
+
 This image requires two volumes to be mounted at the following paths:
 
-* `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials and New Relic key and `wp_salts.json`, which keeps the secure salts used by WordPress.
+* `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials, the Memcached host, the New Relic key and the secure salts and keys used by WordPress.
 * `/var/www/html/wp-content/uploads`: The persistent storage location for WordPress uploads. If it isn't mounted, then those files will be lost as soon as the container is restarted and each swarm node will not have access to each uploaded file.
 
 In case no New Relic app name or key are supplied in the `credentials.json`
@@ -86,6 +105,10 @@ Each node in a swarm needs to share the same salts and keys in order for things
 like logging in and such to be consistent (and actually work) between nodes.
 
 **Please replace the values with new, randomised values found at https://api.wordpress.org/secret-key/1.1/salt/ for production use.**
+
+## Cloud Deployment
+
+* [Google Cloud Services and GKE](docs/gcs_deployment.md)
 
 ## TODOs:
 

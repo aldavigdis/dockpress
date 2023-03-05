@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockpress
+  creationTimestamp: null
+  labels:
+    app: dockpress
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dockpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: dockpress
+    spec:
+      volumes:
+      - name: dockpress-uploads-nfs-pvc
+        persistentVolumeClaim:
+          claimName: dockpress-uploads-nfs-pvc
+          readOnly: false
+      - name: secret-credentials
+        secret:
+          secretName: credentials
+      containers:
+      - image: eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
+        name: dockpress
+        ports:
+          - containerPort: 80
+        resources:
+          limits:
+            memory: 512M
+            cpu: 1000m
+        volumeMounts:
+        - name: dockpress-uploads-nfs-pvc
+          mountPath: /var/www/html/wp-content/uploads
+        - name: 'secret-credentials'
+          mountPath: /secrets
+          readOnly: true
+status: {}

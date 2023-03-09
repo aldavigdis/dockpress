@@ -141,7 +141,7 @@ gcloud container clusters get-credentials dockpress --region=europe-west1
 kubectl config set-cluster dockpress
 ```
 
-##$ Manage credentials
+## Manage credentials
 
 Start by observing `secrets/credentials.json` to make sure that all the
 information in there is correct. Then commit it as a secret to GKS like so:
@@ -207,7 +207,3 @@ kubectl apply -f dockpress-persistent-storage.yml
 kubectl apply -f dockpress-deployment.yml
 ```
 
-```bash
-kubectl get pod
-kubectl exec -it dockpress-58f768bc99-kdbbt -- /bin/bash
-```

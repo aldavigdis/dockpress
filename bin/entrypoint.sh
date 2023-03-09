@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🐘 Configuring PHP"
-RUN /root/configure_php.sh
+bash /root/configure_php.sh
 
 echo "📊 Configuring New Relic"
 bash /root/install_new_relic.sh

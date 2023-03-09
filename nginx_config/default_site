@@ -25,4 +25,6 @@ server {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php8.1-fpm.sock;
     }
+
+    location ^~ /wp-content/uploads/ {}
 }

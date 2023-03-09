@@ -1,10 +1,10 @@
 #!/bin/bash
 
 export NR_KEY=$(jq -r '.new_relic_key' /secrets/credentials.json)
-export NR_APP_NAME=$(jq -r '.new_relic_key' /secrets/credentials.json)
+export NR_APP_NAME=$(jq -r '.new_relic_app_name' /secrets/credentials.json)
 
 # The installation will not happen unless the credentials and ENV variables are set
-if [ $NR_KEY ] && [ $NR_APP_NAME ] && [ $NR_PHP_AGENT_URL ]
+if [ $NR_KEY ] && [ "${NR_APP_NAME}" ] && [ $NR_PHP_AGENT_URL ]
 then
     curl -s -L ${NR_PHP_AGENT_URL} | tar -C /tmp -zx
 
@@ -16,6 +16,7 @@ then
     rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
 
     sed -i -e "s/\"REPLACE_WITH_REAL_KEY\"/\"${NR_KEY}\"/" \
+        -e "s/;newrelic.framework = \"\"/newrelic.framework = \"wordpress\"/" \
         -e "s/newrelic.appname = \"PHP Application\"/newrelic.appname = \"${NR_APP_NAME}\"/" \
         -e 's/;newrelic.daemon.app_connect_timeout =.*/newrelic.daemon.app_connect_timeout=15s/' \
         -e 's/;newrelic.daemon.start_timeout =.*/newrelic.daemon.start_timeout=5s/' \

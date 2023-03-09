@@ -24,6 +24,7 @@ wp config set LOGGED_IN_SALT "\$credentials->logged_in_salt" --raw --allow-root
 wp config set NONCE_SALT "\$credentials->nonce_salt" --raw --allow-root
 
 # Prevent redirect loop from happening if we are running WordPress behind a load balancer
+# This will make WP presume it is running on HTTPS, no matter if it is actually old-school HTTP on port 80
 sed -i "/Add any custom values between this line/a if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) { \$_SERVER['HTTPS'] = 'on'; }" wp-config.php
 
 # Prevent edits and updates as we want the site to be immutable once deployed

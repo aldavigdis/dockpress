@@ -26,14 +26,18 @@ wp config set NONCE_SALT "\$credentials->nonce_salt" --raw --allow-root
 # Prevent redirect loop from happening if we are running WordPress behind a load balancer
 sed -i "/Add any custom values between this line/a if ( isset( \$_SERVER['HTTP_X_FORWARDED_PROTO'] ) && strpos( \$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false ) { \$_SERVER['HTTPS'] = 'on'; }" wp-config.php
 
+# Prevent edits and updates as we want the site to be immutable once deployed
+wp config set DISALLOW_FILE_EDIT true --raw --allow-root
+wp config set WP_AUTO_UPDATE_CORE false --raw --allow-root
+
 # Enable Memcached object storage
 export MEMCACHED_HOST=$(jq -r '.memcached_servers[0]' /secrets/credentials.json)
 if [ $MEMCACHED_HOST ]
 then
     sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php
-    curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached/trunk/object-cache.php > wp-content/object-cache.php
-    chmod 644 /var/www/html/wp-content/object-cache.php
-    chown www-data:www-data /var/www/html/wp-content/object-cache.php
+    curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached/trunk/object-cache.php > ./wp-content/object-cache.php
+    chmod $FILE_MODE ./wp-content/object-cache.php
+    chown $FILE_OWNER ./wp-content/object-cache.php
 fi
 
 # Remove crapware plugins from the WordPress installation

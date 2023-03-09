@@ -21,11 +21,23 @@ deploy it.
 * Keeps credentials, salts and keys in JSON files, located in a persistent volume
 * Supports and runs the New Relic PHP Agent
 
-## Quick Start
+## A quick note
+
+This image is a build-it-yourself template and is **meant to be forked** and
+modified for every use case.
+
+In its current state, it works both in a local development environment using
+Docker Desktop and [GCS/Kubernetes deployment](/docs/gcs_deployment.md) has been
+documented.
+
+However, application-specific things such as modifying the entry point and
+adding the required secrets to pull a WordPress site from a git hosting provider
+(such as Github) for a production site is up to you.
+
+## Quick Start with Docker Desktop
 
 This assumes you are not running this on Docker Desktop for testing or
-development purposes. You may want to do things differently in your production
-or staging environments.
+development purposes.
 
 Set up a MySQL server for WordPress to connect to. (You can do this via Docker
 or locally.)
@@ -112,17 +124,26 @@ like logging in and such to be consistent (and actually work) between nodes.
 
 ## TODOs:
 
-1. Figure out if keeping the defaults for wp-cron is a good idea or if developing a "runner" container for wp-cron is better.
-2. Improve error handling.
-3. Add Redis support.
+1. Find a way to clear or invalidate Memcached easily
+2. Figure out if keeping the defaults for wp-cron is a good idea or if developing a "runner" container for wp-cron is better.
+3. Improve error handling.
+4. Add Redis support.
 
-## Build and send off
+## Build and send off to your private image registry
 
-(The following is for internal purposes.)
+You can do the following
 
 ```bash
-$ docker build -t dockpress . -f Dockerfile
-$ docker run -dp 80:80 dockpress
-$ docker commit <hash> eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
-$ docker push eu.gcr.io/dockerpress-379014/dockpress/dockpress
+export registry_path=eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
+
+docker build -t dockpress . -f Dockerfile
+
+# You can also run `docker create dockpress` if you don't want to test anything
+docker run -dp 80:80 --mount type=bind,src=$(pwd)/secrets,dst=/secrets \
+                     --mount type=bind,src=$(pwd)/uploads,dst=/var/www/html/wp-content/uploads \
+                     dockpress
+
+docker commit $(docker create dockpress) $registry_path
+
+docker push $registry_path
 ```

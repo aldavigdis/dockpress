@@ -8,11 +8,15 @@ ENV CDN_SCOPE 'uploads'
 ENV CDN_UPLOADS_URL 'https://cdn.example.com/wp-content/uploads'
 ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content/'
 
+ENV PHP_UPLOAD_MAX_FILESIZE '64M'
+ENV PHP_POST_MAX_SIZE '128M'
+ENV PHP_MEMORY_LIMIT '256M'
+
 # Wether we should fix file permissions on deployment or not
-ENV NUKE_PERMISSIONS=true
+ENV NUKE_PERMISSIONS true
 
 # Remove Akismet and hello.php during deployment
-ENV REMOVE_CRAP_PLUGINS=true
+ENV REMOVE_CRAP_PLUGINS true
 
 # Stops the WP updating mechanism
 ENV PREVENT_UPDATES true

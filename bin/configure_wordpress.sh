@@ -47,3 +47,8 @@ then
     rm -rf wp-content/plugins/akismet/
     rm -rf wp-content/plugins/hello.php
 fi
+
+# Configure the CDN urls and scope, if enabled
+if [ $CDN_SCOPE ]; then wp config set DOCKPRESS_CDN_SCOPE "$CDN_SCOPE" --allow-root; fi
+if [ $CDN_UPLOADS_URL ]; then wp config set DOCKPRESS_CDN_UPLOADS_URL "$CDN_UPLOADS_URL" --allow-root; fi
+if [ $CDN_CONTENT_URL ]; then wp config set DOCKPRESS_CDN_CONTENT_URL "$CDN_CONTENT_URL" --allow-root; fi

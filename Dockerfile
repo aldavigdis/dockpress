@@ -4,11 +4,15 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
+ENV PHP_UPLOAD_MAX_FILESIZE '64M'
+ENV PHP_POST_MAX_SIZE '128M'
+ENV PHP_MEMORY_LIMIT '256M'
+
 # Wether we should fix file permissions on deployment or not
-ENV NUKE_PERMISSIONS=true
+ENV NUKE_PERMISSIONS true
 
 # Remove Akismet and hello.php during deployment
-ENV REMOVE_CRAP_PLUGINS=true
+ENV REMOVE_CRAP_PLUGINS true
 
 # Stops the WP updating mechanism
 ENV PREVENT_UPDATES true

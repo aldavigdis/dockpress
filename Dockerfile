@@ -50,6 +50,7 @@ COPY mu-plugins/ /root/mu-plugins/
 RUN mkdir mu-plugins
 RUN if [ $PREVENT_UPDATES ]; then cp /root/mu-plugins/dockpress-prevent-updates.php mu-plugins/; fi
 RUN if [ $DISABLE_IMAGE_SCALING ]; then cp /root/mu-plugins/dockpress-disable-image-scaling.php mu-plugins/; fi
+RUN if [ $CDN_SCOPE ]; then cp /root/mu-plugins/dockpress-filter-cdn-url.php mu-plugins/; fi
 
 COPY wordpress_site/ .
 

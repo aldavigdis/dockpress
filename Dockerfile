@@ -4,6 +4,10 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
+ENV CDN_SCOPE 'uploads'
+ENV CDN_UPLOADS_URL 'https://cdn.example.com/wp-content/uploads'
+ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content/'
+
 # Wether we should fix file permissions on deployment or not
 ENV NUKE_PERMISSIONS=true
 

@@ -118,6 +118,19 @@ like logging in and such to be consistent (and actually work) between nodes.
 
 **Please replace the values with new, randomised values found at https://api.wordpress.org/secret-key/1.1/salt/ for production use.**
 
+## Directing assets to a CDN
+
+To activate CDN support, simply comment out and edit the relevant environment variables in the `Dockerfile` and your static assets will be downloaded from a CDN/proxy server instead of your main web server. Your image then needs to be rebuilt and redeployed in order for the changes to take effect.
+
+Note that in some cases, hard-coded URLs to assets will not change automatically and require manual replacement or clever use of WP CLI's `find-replace` command.
+
+Dockpress offers two ways to scope which files are fetched from a general purpose CDN service, defined with the `CDN_SCOPE` environment variable:
+
+* `uploads`: This only affects URLs for what ends up in the `wp-content/uploads` directory
+* `content`: This affects URLs for everything in the `wp-content` directory, including assets from themes and plugins
+
+If you choose to use the `uploads` scope, the base URL for the assets is defined using the `CDN_UPLOADS_URL` environment variable. The base URL for the `content` scope is defined using the `CDN_CONTENT_URL` variable.
+
 ## Cloud Deployment
 
 * [Google Cloud Services and GKE](docs/gcs_deployment.md)

@@ -13,7 +13,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 3
-      maxUnavailable: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -45,4 +45,10 @@ spec:
         - name: 'secret-credentials'
           mountPath: /secrets
           readOnly: true
+        livenessProbe:
+          httpGet:
+            path: '/'
+            port: '80'
+          initialDelaySeconds: 60
+          periodSeconds: 3
 status: {}

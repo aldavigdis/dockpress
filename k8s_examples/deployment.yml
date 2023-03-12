@@ -37,7 +37,7 @@ spec:
         resources:
           limits:
             ephemeral-storage: 1Gi
-            memory: 256Mi
+            memory: 128Mi
             cpu: 100m
         volumeMounts:
         - name: dockpress-uploads-nfs-pvc

@@ -4,9 +4,9 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
-ENV PHP_UPLOAD_MAX_FILESIZE '64M'
-ENV PHP_POST_MAX_SIZE '128M'
-ENV PHP_MEMORY_LIMIT '256M'
+ENV PHP_UPLOAD_MAX_FILESIZE '32M'
+ENV PHP_POST_MAX_SIZE '64M'
+ENV PHP_MEMORY_LIMIT '128M'
 
 # ENV CDN_SCOPE 'uploads'
 # ENV CDN_UPLOADS_URL 'https://cdn.example.com/wp-content/uploads'
@@ -50,7 +50,6 @@ COPY mu-plugins/ /root/mu-plugins/
 RUN mkdir mu-plugins
 RUN if [ $PREVENT_UPDATES ]; then cp /root/mu-plugins/dockpress-prevent-updates.php mu-plugins/; fi
 RUN if [ $DISABLE_IMAGE_SCALING ]; then cp /root/mu-plugins/dockpress-disable-image-scaling.php mu-plugins/; fi
-RUN if [ $CDN_SCOPE ]; then cp /root/mu-plugins/dockpress-filter-cdn-url.php mu-plugins/; fi
 
 COPY wordpress_site/ .
 

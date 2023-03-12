@@ -8,9 +8,7 @@ ENV PHP_UPLOAD_MAX_FILESIZE '64M'
 ENV PHP_POST_MAX_SIZE '128M'
 ENV PHP_MEMORY_LIMIT '256M'
 
-# ENV CDN_SCOPE 'uploads'
-# ENV CDN_UPLOADS_URL 'https://cdn.example.com/wp-content/uploads'
-# ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content/'
+# ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content'
 
 # Wether we should fix file permissions on deployment or not
 ENV NUKE_PERMISSIONS true

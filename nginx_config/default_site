@@ -4,7 +4,7 @@ map $http_x_forwarded_proto $https_flag {
 }
 
 server {
-    serer_name $hostname;
+    server_name $hostname;
 
     listen 80 default_server;
     root /var/www/html;

@@ -4,9 +4,9 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
-ENV PHP_UPLOAD_MAX_FILESIZE '32M'
-ENV PHP_POST_MAX_SIZE '64M'
-ENV PHP_MEMORY_LIMIT '128M'
+ENV PHP_UPLOAD_MAX_FILESIZE '256M'
+ENV PHP_POST_MAX_SIZE '384M'
+ENV PHP_MEMORY_LIMIT '512M'
 
 # ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content'
 

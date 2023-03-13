@@ -35,10 +35,12 @@ spec:
         ports:
           - containerPort: 80
         resources:
+          requests:
+            memory: 512Mi
+            cpu: 250m
           limits:
-            ephemeral-storage: 1Gi
-            memory: 128Mi
-            cpu: 100m
+            memory: 512Mi
+            cpu: 1000m
         volumeMounts:
         - name: dockpress-uploads-nfs-pvc
           mountPath: /var/www/html/wp-content/uploads
@@ -48,7 +50,7 @@ spec:
         livenessProbe:
           httpGet:
             path: '/'
-            port: '80'
+            port: 80
           initialDelaySeconds: 60
           periodSeconds: 3
 status: {}

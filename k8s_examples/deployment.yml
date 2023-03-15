@@ -5,7 +5,7 @@ metadata:
   labels:
     app: dockpress
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: dockpress
@@ -21,10 +21,20 @@ spec:
         environment: production
         type: webserver
     spec:
+      spec:
+      # nodeSelector:
+      #   cloud.google.com/gke-spot: "true"
       volumes:
+      - name: tmpfs
+        emptyDir:
+          sizeLimit: 5Gi
       - name: dockpress-uploads-nfs-pvc
         persistentVolumeClaim:
           claimName: dockpress-uploads-nfs-pvc
+          readOnly: false
+      - name: dockpress-wp-root-nfs-pvc
+        persistentVolumeClaim:
+          claimName: dockpress-wp-root-nfs-pvc
           readOnly: false
       - name: secret-credentials
         secret:
@@ -37,13 +47,18 @@ spec:
         resources:
           requests:
             memory: 512Mi
-            cpu: 250m
+            cpu: 500m
           limits:
-            memory: 512Mi
+            memory: 2048Mi
             cpu: 1000m
+            ephemeral-storage: 5Gi
         volumeMounts:
+        - name: tmpfs
+          mountPath: /tmp
         - name: dockpress-uploads-nfs-pvc
           mountPath: /var/www/html/wp-content/uploads
+        - name: dockpress-wp-root-nfs-pvc
+          mountPath: /var/www/html
         - name: 'secret-credentials'
           mountPath: /secrets
           readOnly: true

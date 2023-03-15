@@ -1,0 +1,31 @@
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "dockpress-service"
+  namespace: "default"
+  labels:
+    app: "dockpress"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+  selector:
+    app: "dockpress"
+  type: "NodePort"
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: "Ingress"
+metadata:
+  name: "dockpress-ingress"
+  labels:
+    app: "dockpress"
+  # annotations:
+  #   kubernetes.io/ingress.class: "gce-internal"
+spec:
+  defaultBackend:
+    service:
+      name: dockpress-service
+      port:
+        number: 80

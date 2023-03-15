@@ -104,8 +104,6 @@ Set the `WP_UPLOADS_URL` environment variable to your CDN's URL and WordPress
 will refer to that server when fetching images and other media from your Media
 Library.
 
-This featue is disabled for logged-in users with the `upload_files` ability.
-
 ### Tweak PHP memory use
 
 You can set the following environment variables, which will then be applied to

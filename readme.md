@@ -7,13 +7,15 @@ for.
 
 ## Features
 
-* Facilitates an immutable WordPress installation in the cloud, using Docker or Kubernetes
-* Runs PHP-FPM 8.1 behind Nginx (as opposed to the legacy apache mod_php of doing things)
+* Facilitates an immutable WordPress installation in the cloud, using **Docker** and **Kubernetes**
+* Runs **PHP-FPM** 8.1 behind **Nginx** (as opposed to the legacy apache mod_php of doing things)
 * Keeps WordPress' uploads directory in a persistent volume
-* Installes Memcached support for WP Object and PHP session storage
-* Keeps credentials, salts and keys in a JSON file
-* Supports and runs the New Relic PHP Agent
+* Installs **Memcached** support for WP Object and PHP session storage
+* Keeps credentials, salts and keys in a JSON file, which can be kept in a Kubernetes secret volume
+* Facilitates the installation of and runs the **New Relic** PHP Agent, which is used for system monitoring
 * Facilitiates changing image URLs to point to a different server (like a CDN)
+* Optionally installs and configures **Ghostscript/GhostPDL**
+* Includes documentation on **Kubernetes** deployment
 
 ## A quick note
 
@@ -64,6 +66,9 @@ That's it!
 
 ## Features
 
+The following is a list of features that can be enabled and facilitated by
+environment variables that are set usig `ENV` statements in the Dockerfile.
+
 ### Fresh WordPress installation
 
 Make sure tha the `WP_INSTALL_IF_NOT_FOUND` environment variable is set and if
@@ -74,14 +79,14 @@ no WordPress installation is found (the entrypoint script checks for
 
 DockPress's WordPress configuration script will not run (for the most part) if
 `wp-config.php` already exists. In order to force it to run on deployment, you
-can set the `FORCE_WP_CONFIG`.
+can set the `FORCE_WP_CONFIG` environment variable.
 
 This may have unintended consequences and it is recommended not to deploy or
-version `wp-config.php`, as DockPress takes care of configuring the WordPress
-installation. (I.e. keep your own `wp-config.php` for development purposes, but
-add it to your `.gitignore` file.)
+version `wp-config.php` for use in Dockpress, as DockPress takes care of
+configuring the WordPress installation. (I.e. keep your own `wp-config.php`
+for development purposes, but add it to your `.gitignore` file.)
 
-### New Relic Agent installation
+### New Relic PHP Agent installation
 
 Set your New Relic credentials in `credentials.json` and the New Relic PHP Agent
 will be installed and configured.
@@ -89,7 +94,11 @@ will be installed and configured.
 If you need a specific version of New Relic, you can set the `NR_PHP_AGENT_URL`
 environment variable to the full URL of the newest version's .tar.gz archive.
 
-### Refer to uploads on a different URL
+Plese not that while optionally hosted in the EU, you may want to inform your
+users about data egress to New Relic's servers, especially as NR injects
+JavaScript code into the frontend of your site for performance monitoring.
+
+### Refer to uploads on a different server
 
 Set the `WP_UPLOADS_URL` environment variable to your CDN's URL and WordPress
 will refer to that server when fetching images and other media from your Media
@@ -144,22 +153,26 @@ likely that the site is exploited by and falls victim to code injection.
 
 ## Further Technical Stuff
 
-This image requires two volumes to be mounted at the following paths:
+### Volume mounts
 
-* `/var/www/html/`: The storage location for the WordPress installation itself. If not set, a fresh installation is made on deployment.
-* `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials, the Memcached host, the New Relic key and the secure salts and keys used by WordPress.
+This image requires the following to be mounted at the following paths:
+
+* `/var/www/html/`: The storage location for the WordPress installation itself. If not set, a fresh installation may be made on deployment.
+* `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials, the Memcached host, the New Relic key and the secure salts and keys used by WordPress. (In Kubernetes, you would use a secret volume for this.)
 * `/var/www/html/wp-content/uploads`: The persistent storage location for WordPress uploads. If it isn't mounted, then those files will be lost as soon as the container is restarted and each swarm node will not have access to each uploaded file.
 
-In case no New Relic app name or key are supplied in the `credentials.json`
-file, the New Relic installer will simply not run.
+### File ownership
 
-The same goes with Memcached. If it is an array containing null, Memcached will
-not be configured as the PHP session store and the Memcached drop-in will not be
-installed.
+The build and deployment is run as root while PHP-FPM and Nginx are run as the
+user www-data. If you keep the WordPress installation and the uploads directory
+in a network storage location, you need to make sure that www-data has read
+access to the WordPress installation and write access to the uploads directory.
 
-MySQL credentials and the WordPress Salts and Keys (stored in
-`secrets/wp-salts.json`) can be changed during runtime as wp-config.php will be
-configured to refer to those values directly.
+NFS complicates this a bit, by insisting on the same user and group ID, which
+may vary between Linux dirstos, but is usually `33` in Debian and Ubuntu based
+distros.
+
+### WordPress keys and salts
 
 Each node in a swarm needs to share the same salts and keys in order for things
 like logging in and such to be consistent (and actually work) between nodes.
@@ -180,12 +193,6 @@ export registry_path=eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
 
 docker build -t dockpress . -f Dockerfile
 
-# You can also run `docker create dockpress` if you don't want to test anything
-docker run -dp 80:80 --mount type=bind,src=$(pwd)/secrets,dst=/secrets \
-                     --mount type=bind,src=$(pwd)/wordpress_site,dst=/var/www/html \
-                     --mount type=bind,src=$(pwd)/uploads,dst=/uploads \
-                     dockpress
-
 docker commit $(docker create dockpress) $registry_path
 
 docker push $registry_path
@@ -195,6 +202,8 @@ docker push $registry_path
 
 Please do not hesistate to contact the author to enquire about a license
 exception or if there are questions about appropriate use of this software.
+
+---
 
 **Copyright (C) 2023 Alda Vigdís Skarphéðinsdóttir (aldavigdis@aldavigdis.is)**
 

@@ -4,14 +4,14 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
+ENV WP_INSTALL_IF_NOT_FOUND true
+# ENV FORCE_WP_CONFIG true
+
 ENV PHP_UPLOAD_MAX_FILESIZE '256M'
 ENV PHP_POST_MAX_SIZE '384M'
 ENV PHP_MEMORY_LIMIT '512M'
 
-# ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content'
-
-# Wether we should fix file permissions on deployment or not
-ENV NUKE_PERMISSIONS true
+# ENV WP_UPLOADS_URL 'https://cdn.example.com'
 
 # Remove Akismet and hello.php during deployment
 ENV REMOVE_CRAP_PLUGINS true
@@ -19,8 +19,8 @@ ENV REMOVE_CRAP_PLUGINS true
 # Stops the WP updating mechanism
 ENV PREVENT_UPDATES true
 
-# Stops WP from preventing large image uploads
-ENV DISABLE_IMAGE_SCALING true
+# Wether we should fix file permissions on deployment or not
+# ENV NUKE_PERMISSIONS true
 
 # The "Hardening WordPress" article at https://wordpress.org/documentation/article/hardening-wordpress/
 # recommends 755 and 644

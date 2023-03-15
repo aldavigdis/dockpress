@@ -1,17 +1,17 @@
 # Dockpress
 
 This is a build-it-yourself Docker image intended for WordPress sites that are
-run in a cluster or a swarm in the cloud. It can also run as a development
+run in a cluster or a swarm in the cloud. It can also run as a development/test
 environment where PHP-FPM, Nginx, Memcached and New Relic need to be accounted
 for.
 
 ## Features
 
-* Facilitates an immutable WordPress installation in the cloud, usin Docker or Kubernetes
+* Facilitates an immutable WordPress installation in the cloud, using Docker or Kubernetes
 * Runs PHP-FPM 8.1 behind Nginx (as opposed to the legacy apache mod_php of doing things)
 * Keeps WordPress' uploads directory in a persistent volume
 * Installes Memcached support for WP Object and PHP session storage
-* Keeps credentials, salts and keys in a JSON file, located in a persistent volume
+* Keeps credentials, salts and keys in a JSON file
 * Supports and runs the New Relic PHP Agent
 * Facilitiates changing image URLs to point to a different server (like a CDN)
 
@@ -19,10 +19,6 @@ for.
 
 This image is a build-it-yourself template and is **meant to be forked** and
 modified for every use case.
-
-In its current state, it works both in a local development environment using
-Docker Desktop and [GCS/Kubernetes deployment](/docs/gcs_deployment.md) has been
-documented.
 
 However, application-specific things such as modifying the entry point and
 adding the required secrets to pull a WordPress site from a git hosting provider
@@ -169,19 +165,6 @@ Each node in a swarm needs to share the same salts and keys in order for things
 like logging in and such to be consistent (and actually work) between nodes.
 
 **Please replace the values with new, randomised values found at https://api.wordpress.org/secret-key/1.1/salt/ for production use.**
-
-## Directing assets to a CDN
-
-To activate CDN support, simply comment out and edit the relevant environment variables in the `Dockerfile` and your static assets will be downloaded from a CDN/proxy server instead of your main web server. Your image then needs to be rebuilt and redeployed in order for the changes to take effect.
-
-Note that in some cases, hard-coded URLs to assets will not change automatically and require manual replacement or clever use of WP CLI's `find-replace` command.
-
-Dockpress offers two ways to scope which files are fetched from a general purpose CDN service, defined with the `CDN_SCOPE` environment variable:
-
-* `uploads`: This only affects URLs for what ends up in the `wp-content/uploads` directory
-* `content`: This affects URLs for everything in the `wp-content` directory, including assets from themes and plugins
-
-If you choose to use the `uploads` scope, the base URL for the assets is defined using the `CDN_UPLOADS_URL` environment variable. The base URL for the `content` scope is defined using the `CDN_CONTENT_URL` variable.
 
 ## Cloud Deployment
 

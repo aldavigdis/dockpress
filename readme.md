@@ -5,21 +5,15 @@ run in a cluster or a swarm in the cloud. It can also run as a development
 environment where PHP-FPM, Nginx, Memcached and New Relic need to be accounted
 for.
 
-You can fork this codebase and use it as the basis of your own WordPress
-development by placing your WP site in the `wordpress_site` directory and
-committing it to the codebase; plugins, themes and all by running
-`git add wordpress_site/*`.
-
-This enables the site to be baked into the Docker image when you build and
-deploy it.
-
 ## Features
 
+* Facilitates an immutable WordPress installation in the cloud, usin Docker or Kubernetes
 * Runs PHP-FPM 8.1 behind Nginx (as opposed to the legacy apache mod_php of doing things)
 * Keeps WordPress' uploads directory in a persistent volume
-* Supports Memcached for WP Object and PHP session storage
-* Keeps credentials, salts and keys in JSON files, located in a persistent volume
+* Installes Memcached support for WP Object and PHP session storage
+* Keeps credentials, salts and keys in a JSON file, located in a persistent volume
 * Supports and runs the New Relic PHP Agent
+* Facilitiates changing image URLs to point to a different server (like a CDN)
 
 ## A quick note
 
@@ -72,33 +66,91 @@ docker run -dp 80:80 --mount type=bind,src=$(pwd)/secrets,dst=/secrets \
 
 That's it!
 
+## Features
+
+### Fresh WordPress installation
+
+Make sure tha the `WP_INSTALL_IF_NOT_FOUND` environment variable is set and if
+no WordPress installation is found (the entrypoint script checks for
+`index.php`), a new version of the WordPress Core is fetched and installed.
+
+### Force WordPress configuration
+
+DockPress's WordPress configuration script will not run (for the most part) if
+`wp-config.php` already exists. In order to force it to run on deployment, you
+can set the `FORCE_WP_CONFIG`.
+
+This may have unintended consequences and it is recommended not to deploy or
+version `wp-config.php`, as DockPress takes care of configuring the WordPress
+installation. (I.e. keep your own `wp-config.php` for development purposes, but
+add it to your `.gitignore` file.)
+
+### New Relic Agent installation
+
+Set your New Relic credentials in `credentials.json` and the New Relic PHP Agent
+will be installed and configured.
+
+If you need a specific version of New Relic, you can set the `NR_PHP_AGENT_URL`
+environment variable to the full URL of the newest version's .tar.gz archive.
+
+### Refer to uploads on a different URL
+
+Set the `WP_UPLOADS_URL` environment variable to your CDN's URL and WordPress
+will refer to that server when fetching images and other media from your Media
+Library.
+
+This featue is disabled for logged-in users with the `upload_files` ability.
+
+### Tweak PHP memory use
+
+You can set the following environment variables, which will then be applied to
+the corresponding values in `php.ini`.
+
+* `PHP_UPLOAD_MAX_FILESIZE`
+* `PHP_POST_MAX_SIZE`
+* `PHP_MEMORY_LIMIT`
+
+Those are currently set to be appropriate for Google Kubernetes Engine's
+*General Purpose* pods.
+
+### Tweak acceptable PHP response time
+
+Set the `PHP_MAX_EXECUTION_TIME` to a numeric value, to set the number of
+seconds to allow PHP processess to run. This sets both the `php.ini` value and
+the relevant Nginx configuration variable.
+
+### Nuke Permissions
+
+Set the `NUKE_PERMISSIONS` environment variable to reset file and directory
+permissions on deployment. This will scan your WordPress installation (but not
+the `.git` or `wp-content/uploads` directories) and set file ownership to
+`FILE_OWNER`, the file mode to `FILE_MODE` and directory mode to
+`DIRECTORY_MODE`
+
+Note that this takes a while to run, so if you are depending on rolling restarts
+in a small cluster, this may not be the right thing to do.
+
+### Remove crap plugins
+
+If the `REMOVE_CRAP_PLUGINS` environment variable is set, the built-in Akismet
+and hello.php plugins are removed from the WordPress installation.
+
+### Prevent updates
+
+Keep the `PREVENT_UPDATES` environment variable set in order to make sure that
+the WordPress core, plugins and themes are not updated.
+
+In case of running DockPress in a cluster, if each node/pod has its own file
+storage and runs the built-in update mechanism,
+
+This also ensures that the WordPress installation is immutable and makes it less
+likely that the site is exploited by and falls victim to code injection.
+
 ## Further Technical Stuff
-
-The source code of the WordPress site is assumed to reside in the
-`wordpress_site/` directory. In case there is no index.php file in there, a
-fresh installation is made using WP-CLI.
-
-Regardless, it is recommended to download WordPress into `wordpress_site/`,
-even if you want to start at a blank slate and adjusting the file permissions
-and ownership in there before building the Docker image.
-
-Assuming you have WP-CLI installed:
-
-```bash
-cd wordpress_site
-wp core download
-chown -R www-data:www-data .
-find . -type d -exec chmod 755 {} \;
-find . -type f -exec chmod 644 {} \;
-cd ..
-docker build -t dockpress . -f Dockerfile
-```
-
-You can set the NUKE_FILE_PERMISSIONS environment variable in the Dockerfile to
-reset the file permissions and ownership.
 
 This image requires two volumes to be mounted at the following paths:
 
+* `/var/www/html/`: The storage location for the WordPress installation itself. If not set, a fresh installation is made on deployment.
 * `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials, the Memcached host, the New Relic key and the secure salts and keys used by WordPress.
 * `/var/www/html/wp-content/uploads`: The persistent storage location for WordPress uploads. If it isn't mounted, then those files will be lost as soon as the container is restarted and each swarm node will not have access to each uploaded file.
 
@@ -135,16 +187,10 @@ If you choose to use the `uploads` scope, the base URL for the assets is defined
 
 * [Google Cloud Services and GKE](docs/gcs_deployment.md)
 
-## TODOs:
-
-1. Find a way to clear or invalidate Memcached easily
-2. Figure out if keeping the defaults for wp-cron is a good idea or if developing a "runner" container for wp-cron is better.
-3. Improve error handling.
-4. Add Redis support.
-
 ## Build and send off to your private image registry
 
-You can do the following
+You can do the following to build and publish a Docker image based on DockPress
+to your private Docker registry:
 
 ```bash
 export registry_path=eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
@@ -153,7 +199,8 @@ docker build -t dockpress . -f Dockerfile
 
 # You can also run `docker create dockpress` if you don't want to test anything
 docker run -dp 80:80 --mount type=bind,src=$(pwd)/secrets,dst=/secrets \
-                     --mount type=bind,src=$(pwd)/uploads,dst=/var/www/html/wp-content/uploads \
+                     --mount type=bind,src=$(pwd)/wordpress_site,dst=/var/www/html \
+                     --mount type=bind,src=$(pwd)/uploads,dst=/uploads \
                      dockpress
 
 docker commit $(docker create dockpress) $registry_path

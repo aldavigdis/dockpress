@@ -7,6 +7,7 @@ ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318
 ENV PHP_UPLOAD_MAX_FILESIZE '256M'
 ENV PHP_POST_MAX_SIZE '384M'
 ENV PHP_MEMORY_LIMIT '512M'
+ENV PHP_MAX_EXECUTION_TIME '240'
 
 # ENV CDN_CONTENT_URL 'https://cdn.example.com/wp-content'
 

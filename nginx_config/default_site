@@ -14,6 +14,14 @@ server {
     proxy_buffers 4 512k;
     proxy_buffer_size 256k;
 
+    client_max_body_size 384M;
+    fastcgi_read_timeout 30;
+    fastcgi_send_timeout 30;
+
+    location / {
+        try_files $uri $uri/ /index.php?q=$uri&$args;
+    }
+
     location ~ \.php$ {
         fastcgi_intercept_errors on;
         fastcgi_param HTTPS $https_flag;

@@ -4,6 +4,8 @@ EXPOSE 80
 
 ENV NR_PHP_AGENT_URL 'https://download.newrelic.com/php_agent/archive/10.6.0.318/newrelic-php5-10.6.0.318-linux.tar.gz'
 
+ENV INSTALL_GHOSTSCRIPT true
+
 ENV WP_INSTALL_IF_NOT_FOUND true
 # ENV FORCE_WP_CONFIG true
 
@@ -35,6 +37,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY ./bin/install_packages.sh /root/install_packages.sh
 RUN bash /root/install_packages.sh
 ENV LANG en_US.utf8
+
+# Install Ghostscript
+COPY ./bin/install_ghostscript.sh /root/install_ghostscript.sh
+RUN if [ $INSTALL_GHOSTSCRIPT ]; then bash /root/install_ghostscript.sh; fi
+
+COPY bin/install_ghostscript.sh /root/install_ghostscript.sh
+RUN /root/install_ghostscript.sh
 
 # Copy over our nginx site config
 COPY ./nginx_config/default_site /etc/nginx/sites-enabled/default

@@ -44,15 +44,9 @@ RUN /root/configure_nginx.sh
 
 WORKDIR /var/www/html
 
+# COPY wordpress_site/ .
+
 COPY mu-plugins/ /root/mu-plugins/
-RUN mkdir mu-plugins
-RUN if [ $PREVENT_UPDATES ]; then cp /root/mu-plugins/dockpress-prevent-updates.php mu-plugins/; fi
-RUN if [ $DISABLE_IMAGE_SCALING ]; then cp /root/mu-plugins/dockpress-disable-image-scaling.php mu-plugins/; fi
-
-COPY wordpress_site/ .
-
-# If there was no index.php file located in the site/ directory, we fetch a fresh installation of WordPress
-RUN if [ ! -f index.php ]; then wp core download --allow-root; fi
 
 COPY bin/* /root/
 

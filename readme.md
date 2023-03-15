@@ -8,7 +8,7 @@ for.
 ## Features
 
 * Facilitates an immutable WordPress installation in the cloud, using **Docker** and **Kubernetes**
-* Runs **PHP-FPM** 8.1 behind **Nginx** (as opposed to the legacy apache mod_php of doing things)
+* Runs **PHP-FPM** 8.1 behind **Nginx** (as opposed to the legacy apache mod_php way of doing things)
 * Keeps WordPress' uploads directory in a persistent volume
 * Installs **Memcached** support for WP Object and PHP session storage
 * Keeps credentials, salts and keys in a JSON file, which can be kept in a Kubernetes secret volume

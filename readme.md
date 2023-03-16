@@ -15,10 +15,7 @@ for.
 * Facilitates the installation of and runs the **New Relic** PHP Agent, which is used for system monitoring
 * Facilitiates changing image URLs to point to a different server (like a CDN)
 * Optionally installs and configures **Ghostscript/GhostPDL**
-<<<<<<< HEAD
 * Includes documentation on **Kubernetes** deployment
-=======
->>>>>>> 5effee4 (Adding optional Ghostscript/GhostPDL installer)
 
 ## A quick note
 

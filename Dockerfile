@@ -42,9 +42,6 @@ ENV LANG en_US.utf8
 COPY ./bin/install_ghostscript.sh /root/install_ghostscript.sh
 RUN if [ $INSTALL_GHOSTSCRIPT ]; then bash /root/install_ghostscript.sh; fi
 
-COPY bin/install_ghostscript.sh /root/install_ghostscript.sh
-RUN /root/install_ghostscript.sh
-
 # Copy over our nginx site config
 COPY ./nginx_config/default_site /etc/nginx/sites-enabled/default
 

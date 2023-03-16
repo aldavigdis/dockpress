@@ -14,7 +14,7 @@ for.
 * Keeps credentials, salts and keys in a JSON file, which can be kept in a Kubernetes secret volume
 * Facilitates the installation of and runs the **New Relic** PHP Agent, which is used for system monitoring
 * Facilitiates changing image URLs to point to a different server (like a CDN)
-* Optionally installs and configures **Ghostscript/GhostPDL**
+* Optionally installs and configures **Ghostscript** to work with ImageMagick and PHP
 * Includes documentation on **Kubernetes** deployment
 
 ## A quick note

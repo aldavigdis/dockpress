@@ -15,7 +15,10 @@ for.
 * Facilitates the installation of and runs the **New Relic** PHP Agent, which is used for system monitoring
 * Facilitiates changing image URLs to point to a different server (like a CDN)
 * Optionally installs and configures **Ghostscript/GhostPDL**
+<<<<<<< HEAD
 * Includes documentation on **Kubernetes** deployment
+=======
+>>>>>>> 5effee4 (Adding optional Ghostscript/GhostPDL installer)
 
 ## A quick note
 
@@ -149,6 +152,20 @@ storage and runs the built-in update mechanism,
 This also ensures that the WordPress installation is immutable and makes it less
 likely that the site is exploited by and falls victim to code injection.
 
+### Ghostscript (GhostPDL) installation
+
+Set the `INSTALL_GHOSTSCRIPT` environment variable to enable the installation of
+Ghostscript (as a part of the larger GhostPDL package).
+
+Ghostpress may take a while to build from source.
+
+Note that while *open source*, Ghostscript and GhostPDL are, like this package,
+licenced under the GNU Affero General Public License by Artifex Software Inc and
+availabe commerically as well.
+
+Please check [Artiflex's licencing information](https://artifex.com/licensing/)
+for more information on their licencing terms.
+
 ## Further Technical Stuff
 
 ### Volume mounts
@@ -197,6 +214,13 @@ docker push $registry_path
 ```
 
 ## Licence
+
+This software is licenced according to and is subject to the GNU Affero General
+Public License (AGPL), with the possibility of an exception upon request.
+
+The 3rd party software that it installs during build is generally subject to the
+GPL licence or other highly permissive licences, with the exception of
+Ghostscript/GhostPDL, which is also distributed according to the AGPL.
 
 Please do not hesistate to contact the author to enquire about a license
 exception or if there are questions about appropriate use of this software.

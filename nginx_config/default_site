@@ -30,5 +30,9 @@ server {
         fastcgi_pass unix:/run/php/php8.1-fpm.sock;
     }
 
-    location ^~ /wp-content/uploads/ {}
+
+    location = /xmlrpc.php {
+        deny all;
+        return 403;
+    }
 }

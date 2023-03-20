@@ -1,4 +1,5 @@
 <?php
+
 if (defined('UPLOADS_URL')) {
     add_filter(
         'pre_option_upload_url_path',

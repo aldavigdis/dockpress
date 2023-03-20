@@ -61,9 +61,9 @@ then
 
     # Configure the CDN urls and scope, if enabled
 
-    if [ $CDN_CONTENT_URL ]
+    if [ $WP_CONTENT_URL ]
     then
-        wp config set WP_CONTENT_URL "$CDN_CONTENT_URL" --allow-root
+        wp config set WP_CONTENT_URL "$WP_CONTENT_URL" --allow-root
     fi
 fi
 

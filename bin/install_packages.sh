@@ -2,7 +2,7 @@
 
 apt-get update
 apt-get install software-properties-common -y
-add-apt-repository ppa:ondrej/php
+add-apt-repository ppa:ondrej/php -y
 apt-get install sudo nginx php8.1-fpm php8.1 \
                 php8.1-mysqli php8.1-curl php8.1-memcached php8.1-memcache \
                 php8.1-zip php8.1-dom php8.1-mbstring -y php8.1-imagick \

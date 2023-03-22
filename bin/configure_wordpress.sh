@@ -44,6 +44,11 @@ then
     wp config set DISALLOW_FILE_EDIT true --raw --allow-root
     wp config set WP_AUTO_UPDATE_CORE false --raw --allow-root
 
+    if [ $DISABLE_WP_CRON ]
+    then
+        wp config set DISABLE_WP_CRON true --allow-root
+    fi
+
     if [ $WP_UPLOADS_URL ]
     then
         wp config set UPLOADS_URL "$WP_UPLOADS_URL" --allow-root

@@ -14,7 +14,8 @@ ENV PHP_POST_MAX_SIZE '384M'
 ENV PHP_MEMORY_LIMIT '512M'
 ENV PHP_MAX_EXECUTION_TIME '240'
 
-# ENV WP_UPLOADS_URL 'https://cdn.example.com'
+# ENV WP_UPLOADS_URL 'https://cdn.aldavigdis.dev'
+ENV WP_CONTENT_URL 'https://cdn.aldavigdis.dev'
 
 # Remove Akismet and hello.php during deployment
 ENV REMOVE_CRAP_PLUGINS true

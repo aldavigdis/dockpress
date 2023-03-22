@@ -78,3 +78,10 @@ then
     rm -rf wp-content/plugins/akismet/
     rm -rf wp-content/plugins/hello.php
 fi
+
+if [ ! -d wp-content/uploads ]
+then
+    echo "📁 Creating uploads directory"
+    mkdir wp-content/uploads
+    chmod a+rw wp-content/uploads
+fi

@@ -11,7 +11,7 @@ function dockpress_delay_upload_until_synced_with_cdn($file) {
     $i = 0;
     while($i < 5) {
         sleep(5);
-        $check_headers = get_headers($url);
+        $check_headers = get_headers($file['url']);
         if (str_contains($check_headers[0], '200')) {
             return $file;
         }

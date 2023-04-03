@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:lunar
 
 EXPOSE 80
 
@@ -28,8 +28,8 @@ ENV PREVENT_UPDATES true
 # ENV NUKE_PERMISSIONS true
 
 # The "Hardening WordPress" article at https://wordpress.org/documentation/article/hardening-wordpress/
-# recommends 755 and 644
-ENV FILE_OWNER 'www-data:www-data'
+# recommends 755 and 644. 
+ENV FILE_OWNER 'root:root'
 ENV FILE_MODE 444
 ENV DIRECTORY_MODE 555
 
@@ -58,7 +58,5 @@ WORKDIR /var/www/html
 COPY mu-plugins/ /root/mu-plugins/
 
 COPY bin/* /root/
-
-RUN mkdir /run/php
 
 ENTRYPOINT /root/entrypoint.sh

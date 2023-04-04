@@ -70,6 +70,16 @@ then
     then
         wp config set WP_CONTENT_URL "$WP_CONTENT_URL" --allow-root
     fi
+
+    if [ $WP_THEME_INSTALL ]
+    then
+        wp theme install "$WP_THEME_INSTALL" --allow-root
+    fi
+
+    if [ $WP_THEME_ACTIVATE ]
+    then
+        wp theme activate "$WP_THEME_ACTIVATE" --allow-root
+    fi
 fi
 
 # Remove crapware plugins from the WordPress installation

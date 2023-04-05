@@ -1,0 +1,21 @@
+{
+    "name": "aldavigdis/dockpress",
+    "description": "A Docker image for running WordPress in the cloud, with Memcached and New Relic support built in",
+    "type": "docker-image",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Alda Vigdís Skarphéðinsdóttir",
+            "email": "aldavigdis@aldavigdis.is"
+        }
+    ],
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "wp-coding-standards/wpcs": "^2.3"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

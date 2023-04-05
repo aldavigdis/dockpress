@@ -28,7 +28,7 @@ ENV PREVENT_UPDATES true
 # ENV NUKE_PERMISSIONS true
 
 # The "Hardening WordPress" article at https://wordpress.org/documentation/article/hardening-wordpress/
-# recommends 755 and 644. 
+# recommends 755 and 644.
 ENV FILE_OWNER 'root:root'
 ENV FILE_MODE 444
 ENV DIRECTORY_MODE 555

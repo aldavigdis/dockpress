@@ -49,6 +49,7 @@ function dockpress_delay_upload_until_synced_with_cdn( $upload ) {
 		}
 	}
 	if ( true === WP_DEBUG ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( "DockPress: CDN sync timeout for {$upload['url']}" );
 	}
 	return $upload;

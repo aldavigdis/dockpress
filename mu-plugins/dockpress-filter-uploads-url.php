@@ -4,7 +4,12 @@
  * root url defined using the UPLOADS_URL constant in wp-config.php.
  *
  * This is unlike the effects of setting the value of WP_CONTENT_URL as here,
- * we only retreive media files from the specified root url but not all static content such as CSS and JS files.
+ * we only retreive media files from the specified root url but not all static
+ * content such as CSS and JS files.
+ *
+ * This is similar in function to the Jetpack CDN feature and may be a bit
+ * better than changing the WP_CONTENT_URL constant as a whole in case the CSS
+ * is being worked on frequently.
  *
  * @package dockpress
  */

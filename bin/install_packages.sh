@@ -1,7 +1,6 @@
 #!/bin/bash
 
 apt-get update
-apt-get install software-properties-common -y
 apt-get dist-upgrade -y
 apt-get install nginx php8.1-fpm php8.1 \
                 php8.1-mysql php8.1-curl php8.1-memcached php8.1-memcache \

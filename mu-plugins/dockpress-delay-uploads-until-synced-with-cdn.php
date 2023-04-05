@@ -49,9 +49,7 @@ function dockpress_delay_upload_until_synced_with_cdn( $upload ) {
 		}
 	}
 	if ( true === WP_DEBUG ) {
-		error_log(
-			"DockPress: CDN sync delay time expired for {$upload['url']}"
-		);
+		error_log( "DockPress: CDN sync timeout for {$upload['url']}" );
 	}
 	return $upload;
 }

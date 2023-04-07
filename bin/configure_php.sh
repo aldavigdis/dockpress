@@ -6,6 +6,11 @@ sed -i -e "s/post_max_size = 8M/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php/
 sed -i -e "s/memory_limit = 128M/memory_limit = ${PHP_MEMORY_LIMIT}/" /etc/php/8.1/fpm/php.ini
 sed -i -e "s/max_execution_time = 30/max_execution_time = ${PHP_MAX_EXECUTION_TIME}/" /etc/php/8.1/fpm/php.ini
 
+sed -i -e "s/error_reporting =.*/error_reporting = ${PHP_ERROR_REPORTING}/" /etc/php/8.1/fpm/php.ini
+
+sed -i "/\;catch_workers_output = yes/a catch_workers_output = yes" /etc/php/8.1/fpm/pool.d/www.conf
+
+
 # Make Memcached the PHP session handler if the $MEMCACHED_HOST environment variable is set
 export MEMCACHED_HOST=$(jq -r '.memcached_servers[0]' /secrets/credentials.json)
 if [ $MEMCACHED_HOST ]

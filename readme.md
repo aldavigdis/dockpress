@@ -75,6 +75,9 @@ Make sure tha the `WP_INSTALL_IF_NOT_FOUND` environment variable is set and if
 no WordPress installation is found (the entrypoint script checks for
 `index.php`), a new version of the WordPress Core is fetched and installed.
 
+This is based on `wp-config-sample.php`, so that one needs to be in there for
+the installation to work.
+
 ### Force WordPress configuration
 
 DockPress's WordPress configuration script will not run (for the most part) if
@@ -85,6 +88,10 @@ This may have unintended consequences and it is recommended not to deploy or
 version `wp-config.php` for use in Dockpress, as DockPress takes care of
 configuring the WordPress installation. (I.e. keep your own `wp-config.php`
 for development purposes, but add it to your `.gitignore` file.)
+
+Furthermore, DockPress runs WP-CLI as root. If you have a WordPress installation
+running and use `FORCE_WP_CONFIG`, the WP Core, themes, plugins, drop-ins etc.
+will be run by root, which is the most priveleged user account on the system.
 
 ### New Relic PHP Agent installation
 
@@ -97,6 +104,18 @@ environment variable to the full URL of the newest version's .tar.gz archive.
 Plese not that while optionally hosted in the EU, you may want to inform your
 users about data egress to New Relic's servers, especially as NR injects
 JavaScript code into the frontend of your site for performance monitoring.
+
+### Debugging and error logging
+
+Make sure that the `WP_DEBUG` environment varialbe is set to enable error
+logging for WordPress' PHP bits and plugins that supress error reporting unless
+`WP_DEBUG` is enabled.
+
+Note that errors, warnings and notices are not displayed in the web interface,
+but appear in the system log instead.
+
+Non-minified versions of the WP Core's JavaScript libraries and CSS can be
+loaded by setting the `WP_SCRIPT_DEBUG` environment variable.
 
 ### Refer to uploads on a different server
 

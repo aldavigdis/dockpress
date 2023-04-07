@@ -44,6 +44,17 @@ then
     wp config set DISALLOW_FILE_EDIT true --raw --allow-root
     wp config set WP_AUTO_UPDATE_CORE false --raw --allow-root
 
+    if [ $WP_DEBUG ]
+    then
+        wp config set WP_DEBUG true --raw --allow-root
+        wp config set WP_DEBUG_DISPLAY false --raw --allow-root
+    fi
+
+    if [ $WP_SCRIPT_DEBUG ]
+    then
+        wp config set SCRIPT_DEBUG false --raw --allow-root
+    fi
+
     if [ $DISABLE_WP_CRON ]
     then
         wp config set DISABLE_WP_CRON true --allow-root

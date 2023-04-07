@@ -49,8 +49,12 @@ function dockpress_delay_upload_until_synced_with_cdn( $upload ) {
 		}
 	}
 	if ( true === WP_DEBUG ) {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "DockPress: CDN sync timeout for {$upload['url']}" );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+		trigger_error(
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			"DockPress: CDN sync timeout for {$upload['url']}",
+			E_USER_WARNING
+		);
 	}
 	return $upload;
 }

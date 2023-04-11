@@ -91,6 +91,16 @@ then
     then
         wp theme activate "$WP_THEME_ACTIVATE" --allow-root
     fi
+
+    if [ $WP_PLUGIN_INSTALL ]
+    then
+        wp plugin install "$WP_PLUGIN_INSTALL" --allow-root
+    fi
+
+    if [ $WP_PLUGIN_ACTIVATE ]
+    then
+        wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
+    fi
 fi
 
 # Remove crapware plugins from the WordPress installation

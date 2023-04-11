@@ -38,7 +38,7 @@ add_action(
  *
  * @package dockpress
  */
-function dockpress_delay_upload_until_synced_with_cdn( $upload ) {
+function dockpress_delay_upload_until_synced_with_cdn( array $upload ) {
 	for ( $i = 0; $i < 5; $i++ ) {
 		if ( $i < 0 ) {
 			sleep( 5 );

@@ -55,6 +55,15 @@ then
         wp config set SCRIPT_DEBUG false --raw --allow-root
     fi
 
+    if [ -v $WP_MEMORY_LIMIT ]
+    then
+        wp config set WP_MEMORY_LIMIT "$WP_MEMORY_LIMIT" --allow-root
+        wp config set WP_MAX_MEMORY_LIMIT "$WP_MEMORY_LIMIT" --allow-root
+    else
+        wp config set WP_MEMORY_LIMIT "ini_get( 'memory_limit' )" --raw --allow-root
+        wp config set WP_MAX_MEMORY_LIMIT "ini_get( 'memory_limit' )" --raw --allow-root
+    fi
+
     if [ $DISABLE_WP_CRON ]
     then
         wp config set DISABLE_WP_CRON true --allow-root

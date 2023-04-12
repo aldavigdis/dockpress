@@ -1,0 +1,234 @@
+# DockPress Example GKE Omnibus
+#
+# This is a template intended for running a DockPress workload in an already
+# initialised Kubernetes cluster.
+#
+# This file is intended to work as a templete. You will need to go over and
+# replace some values in this file to fit to your current infrastructure in
+# order to use it.
+#
+# Before you use this file, you will need:
+#
+# * A VPC network for your project (https://cloud.google.com/vpc/docs/vpc)
+# * A MySQL service (https://cloud.google.com/sql/mysql)
+# * An NFS file server, either on a VM or GCS File Store
+# * An external IP address (https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address)
+# * A/CNAME DNS records in place for that IP address
+# * A Kubernetes cluster (https://cloud.google.com/kubernetes-engine/docs/concepts/regional-clusters)
+# * Authentication set up with the cluster (https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication)
+#
+# You can also set up an optional Memcached server to optimise things further.
+# You can do so either by setting up a Memcached Memorystore service (expensive)
+# or a VM with Memcached running (less expensive).
+#
+# Remember that you may need to allow your Kubernetes cluster to connect to your
+# VPC in port 11211 for Memcached caching to work.
+#
+# Once those things are up and running, have a look at the sections below,
+# replace any values with your own and run this file in kubectl.
+# If you don't feel like it's right to run all at once, feel free to break it up
+# into multiple files or feed the YAML values into kubectl's STDIN.
+#
+# =============================================================================
+
+# Create a persistent volume for the WordPress installation from an NFS server
+#
+# This may be a GCS File Store service or a virtual machine with an exposed NFS
+# server. The user wp-services, with userid 699, needs to be able to read from
+# the WP root directory and to write to the WordPress uploads directory (usually
+# located at wp-content/uploads).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dockpress-wp-root-nfs-pv
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Mi
+  nfs:
+    path: /mnt/wp_root
+    server: '10.132.0.33'
+
+---
+
+# Creates a persistent volume claim to the NFS volume created above
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dockpress-wp-root-nfs-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
+  volumeName: dockpress-wp-root-nfs-pv
+  resources:
+    requests:
+      storage: 1Mi
+
+---
+
+# Create a secret file for credentials and keys
+#
+# This sets up authentication for the database, New Relic, Memcached and the
+# special WordPress salts and keys. Do remember to rotate the keys and salts by
+# adding random values from random.org!
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+stringData:
+  credentials.json: |
+    {
+        "mysql_server":       "10.132.0.10:3306",
+        "mysql_db":           "wordpress",
+        "mysql_user":         "root",
+        "mysql_password":     "A9YwMzvGsbSYa8sYMMRBQuWr",
+        "new_relic_app_name": "",
+        "new_relic_key":      "",
+        "memcached_servers":  ["10.123.81.131:11211"],
+        "memcached_key_salt": "ciVWNmAjdnKO5SUkEoUI",
+        "auth_key":          "SuuPyW6VmNCHtUIyMjj9",
+        "secure_auth_key":   "oEZl3jIFUOdgAfEpjtPE",
+        "logged_in_key":     "HnCiub8gPhoxs8gFWtuA",
+        "nonce_key":         "GSfL7q0E7f1VWQzwvIv5",
+        "auth_salt":         "YrdqeWT3dfcCv46yY19H",
+        "secure_auth_salt":  "sZ3vthTmfp0U60vGZjRX",
+        "logged_in_salt":    "kToEN1cJe4aKDOq0iItf",
+        "nonce_salt":        "uG1u4lyr3xXOKCY1cWih"
+    }
+
+---
+
+# Create a deployment for our Kubernetes cluster
+#
+# Defines the number of replicas, how updates and restarts happen and the
+# resources used for each node.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockpress
+  labels:
+    app: dockpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dockpress
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: dockpress
+        environment: production
+        type: webserver
+    spec:
+      spec:
+      volumes:
+      - name: tmpfs
+        emptyDir:
+          sizeLimit: 5Gi
+      - name: dockpress-wp-root-nfs-pvc
+        persistentVolumeClaim:
+          claimName: dockpress-wp-root-nfs-pvc
+          readOnly: false
+      - name: secret-credentials
+        secret:
+          secretName: credentials
+      containers:
+      - image: eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
+        name: dockpress
+        ports:
+          - containerPort: 80
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m
+          limits:
+            memory: 2048Mi
+            cpu: 1000m
+            ephemeral-storage: 5Gi
+        volumeMounts:
+        - name: tmpfs
+          mountPath: /tmp
+        - name: dockpress-wp-root-nfs-pvc
+          mountPath: /var/www/html
+        - name: 'secret-credentials'
+          mountPath: /secrets
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: '/'
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 3
+status: {}
+
+---
+
+# Create a service with an internal IP address
+#
+# This will then be exposed to the public Internet using an ingress, using
+# http-to-https forwarding and a managed TLS certificate.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockpress-service
+spec:
+  selector:
+    app: dockpress
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+
+# Create a GKE frontend configuration to redirect HTTP URLs to HTTPS
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: dockpress-frontend-config
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+
+---
+
+# Create a GCS managed TLS certificate for the ingress
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: managed-cert
+spec:
+  domains:
+    - example.com
+    - www.example.com
+
+---
+
+# Create a GKE managed ingress services
+#
+# This one uses
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: managed-cert-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: dockpress-external-ip-address
+    networking.gke.io/v1beta1.FrontendConfig: "dockpress-frontend-config"
+    networking.gke.io/managed-certificates: managed-cert
+    kubernetes.io/ingress.class: "gce"
+spec:
+  defaultBackend:
+    service:
+      name: dockpress-service
+      port:
+        number: 80

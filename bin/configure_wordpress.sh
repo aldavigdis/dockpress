@@ -2,7 +2,12 @@
 
 if [ ! -f index.php ] && [ $WP_INSTALL_IF_NOT_FOUND ]
 then
-    wp core download --allow-root
+    if [ $WP_INSTALL_VERSION ]
+    then
+        wp core download --version="$WP_INSTALL_VERSION" --allow-root
+    else
+        wp core download --allow-root
+    fi
 fi
 
 if [ ! -d wp-content/mu-plugins ]
@@ -83,8 +88,6 @@ then
         chmod $FILE_MODE ./wp-content/object-cache.php
         chown $FILE_OWNER ./wp-content/object-cache.php
     fi
-
-    # Configure the CDN urls and scope, if enabled
 
     if [ $WP_CONTENT_URL ]
     then

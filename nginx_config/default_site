@@ -35,4 +35,6 @@ server {
         deny all;
         return 403;
     }
+
+    add_header X-DockPress "This site uses DockPress to manage WordPress in the cloud. https://github.com/aldavigdis/dockpress";
 }

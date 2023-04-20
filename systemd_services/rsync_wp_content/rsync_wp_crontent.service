@@ -1,0 +1,13 @@
+[Unit]
+Description=Syncs the wp-content directory with a storage bucket
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+User=wp-services
+ExecStart=/usr/local/bin/rsync_wp_content.sh
+
+[Install]
+WantedBy=multi-user.target

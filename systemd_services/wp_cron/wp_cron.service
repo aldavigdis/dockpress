@@ -1,0 +1,13 @@
+[Unit]
+Description=Runs wp_cron on 10 second intervals
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+User=www-data
+ExecStart=/usr/local/bin/wp_cron.sh
+
+[Install]
+WantedBy=multi-user.target

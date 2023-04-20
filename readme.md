@@ -1,11 +1,30 @@
-# Dockpress
+# DockPress
+
+```
+   ______   _____  _______ _     _  _____   ______ _______ _______ _______
+   |     \ |     | |       |____/  |_____] |_____/ |______ |______ |______
+   |_____/ |_____| |_____  |    \_ |       |    \_ |______ ______| ______|
+
+```
 
 This is a build-it-yourself Docker image intended for WordPress sites that are
 run in a cluster or a swarm in the cloud. It can also run as a development/test
 environment where PHP-FPM, Nginx, Memcached and New Relic need to be accounted
 for.
 
-## Features
+DockPress is designed with Kubernetes in mind and includes documentation on
+deployment and operations in Google Cloud and Google Kubernetes engine.
+
+Contributions are welcome.
+
+This image is a build-it-yourself template and is **meant to be forked** and
+modified for every use case, under the AGPL licence.
+
+Application-specific things such as modifying the entry point and adding the
+required secrets to pull a WordPress site from a git hosting provider (such as
+Github) for a production site is up to you.
+
+## DockPress has:
 
 * Facilitates an immutable WordPress installation in the cloud, using **Docker** and **Kubernetes**
 * Runs **PHP-FPM** 8.1 behind **Nginx** (as opposed to the legacy apache mod_php way of doing things)
@@ -15,38 +34,49 @@ for.
 * Facilitates the installation of and runs the **New Relic** PHP Agent, which is used for system monitoring
 * Facilitiates changing image URLs to point to a different server (like a CDN)
 * Installs and configures **Ghostscript** to work with ImageMagick and PHP to generate PDF thumbnails
-* Includes documentation on **Kubernetes** deployment
+* Includes documentation on **Kubernetes** deployment on Google Cloud
 
-## A quick note
+## Needed contributions:
 
-This image is a build-it-yourself template and is **meant to be forked** and
-modified for every use case.
-
-However, application-specific things such as modifying the entry point and
-adding the required secrets to pull a WordPress site from a git hosting provider
-(such as Github) for a production site is up to you.
+* Improved testing and documentation
+* Usage examples for beginner to advanced use
+* Documentation and example YAML files for other cloud services such as AWS and IBM Cloud
+* Scripts and interfaces to build YAML files and feed into `kubectl` based on variables
 
 ## Quick Start with Docker Desktop
 
 This assumes you are not running this on Docker Desktop for testing or
 development purposes.
 
-Set up a MySQL server for WordPress to connect to. (You can do this via Docker
-or locally.)
-
-Optionally, you can set up a Memcached server. (Docker is ideal for this, as
-this does not need persistent storage.)
-
-Then you may want to sign up for New Relic.
-
-Copy your WordPress codebase into the `wordpress_site/` directory, including
-your plugins, themes and other modifications to the code. If you don't have a
-site ready, a new one is provisioned automatically if that directory does not
-have an `index.php` file in it.
+Set up a MySQL server for WordPress to connect to and note down its IP address.
+(You can do this via Docker or locally.)
 
 Edit the `secets/credentials.json` file with the correct information and
 credentials for your database, New Relic setup (leave blank if none) and the
 Memcached server (leave as-is if none).
+
+Example:
+
+```json
+{
+    "mysql_server":       "172.17.0.2:3306",
+    "mysql_db":           "wordpress",
+    "mysql_user":         "root",
+    "mysql_password":     "very_secure_password",
+    "new_relic_app_name": "",
+    "new_relic_key":      "",
+    "memcached_servers":  [""],
+    "memcached_key_salt": "ciVWNmAjdnKO5SUkEoUI",
+    "auth_key":          "SuuPyW6VmNCHtUIyMjj9",
+    "secure_auth_key":   "oEZl3jIFUOdgAfEpjtPE",
+    "logged_in_key":     "HnCiub8gPhoxs8gFWtuA",
+    "nonce_key":         "GSfL7q0E7f1VWQzwvIv5",
+    "auth_salt":         "YrdqeWT3dfcCv46yY19H",
+    "secure_auth_salt":  "sZ3vthTmfp0U60vGZjRX",
+    "logged_in_salt":    "kToEN1cJe4aKDOq0iItf",
+    "nonce_salt":        "uG1u4lyr3xXOKCY1cWih"
+}
+```
 
 Build the Docker image:
 
@@ -58,7 +88,6 @@ Run the Docker image:
 
 ```bash
 docker run -dp 80:80 --mount type=bind,src=$(pwd)/secrets,dst=/secrets \
-                     --mount type=bind,src=$(pwd)/uploads,dst=/var/www/html/wp-content/uploads \
                      dockpress
 ```
 
@@ -119,9 +148,14 @@ loaded by setting the `WP_SCRIPT_DEBUG` environment variable.
 
 ### Refer to uploads on a different server
 
-Set the `WP_UPLOADS_URL` environment variable to your CDN's URL and WordPress
-will refer to that server when fetching images and other media from your Media
-Library.
+Set the `WP_UPLOADS_URL` or `WP_CONTENT_URL` environment variables to your CDN's
+URL and WordPress will refer to that server when fetching images and other media
+from your Media Library.
+
+If you are syncing static files between your DockPress managed WP installation
+and a CDN bucket, DockPress installs an mu-plugin that waits for files uploaded
+using the Media Library to be reached from the CDN, before a the upload is
+confirmed.
 
 ### Tweak PHP memory use
 
@@ -134,6 +168,13 @@ the corresponding values in `php.ini`.
 
 Those are currently set to be appropriate for Google Kubernetes Engine's
 *General Purpose* pods.
+
+Also note that WordPress tends to override the `PHP_MEMORY_LIMIT` value and uses
+its own value, which is set to `40M` per process as if it's still the 90's and
+most WordPress plugins weren't horriby inefficient.
+
+To get past this, make sure that the `WP_MEMORY_LIMIT` ENV variable is set to a
+good portion of the `PHP_MEMORY_LIMIT`. DockPress sets it to `448MB` by default.
 
 ### Tweak acceptable PHP response time
 
@@ -184,31 +225,38 @@ for more information on their licencing terms.
 
 ## Further Technical Stuff
 
-### Volume mounts
+### Users
 
-This image requires the following to be mounted at the following paths:
+Nginx and PHP-FPM run WordPress as the service account `www-data` by default.
+In DockPress, the web root and the files in the WordPress installation are owned
+by a service account `wp-services`, which then has elevated access.
+
+This arrangement makes sure that the web server does not write files into the
+WordPress installation while enabling maintainance, file sync and other tasks to
+be run using a specific account.
+
+### Expected volume mounts
 
 * `/var/www/html/`: The storage location for the WordPress installation itself. If not set, a fresh installation may be made on deployment.
 * `/secrets`: Contains the file `credentials.json`, which includes our MySQL credentials, the Memcached host, the New Relic key and the secure salts and keys used by WordPress. (In Kubernetes, you would use a secret volume for this.)
-* `/var/www/html/wp-content/uploads`: The persistent storage location for WordPress uploads. If it isn't mounted, then those files will be lost as soon as the container is restarted and each swarm node will not have access to each uploaded file.
 
-### File ownership
+### File permissions
 
-The build and deployment is run as root while PHP-FPM and Nginx are run as the
-user www-data. If you keep the WordPress installation and the uploads directory
-in a network storage location, you need to make sure that www-data has read
-access to the WordPress installation and write access to the uploads directory.
+The Linux service account `www-data` (Debian user ID `33`) nees to have read
+access to the mounted volumes and write access to
+`/var/www/html/wp-content/uploads`.
 
-NFS complicates this a bit, by insisting on the same user and group ID, which
-may vary between Linux dirstos, but is usually `33` in Debian and Ubuntu based
-distros.
+Choosing to mount a volume accessed by `www-data` outside of `/var/www/html` may
+result in SELinux stepping in and blocking access.
 
 ### WordPress keys and salts
 
 Each node in a swarm needs to share the same salts and keys in order for things
 like logging in and such to be consistent (and actually work) between nodes.
 
-**Please replace the values with new, randomised values found at https://api.wordpress.org/secret-key/1.1/salt/ for production use.**
+**Please replace the values with new, randomised values found at
+https://api.wordpress.org/secret-key/1.1/salt/ or https://random.org for
+production use.**
 
 ## Cloud Deployment
 
@@ -217,15 +265,13 @@ like logging in and such to be consistent (and actually work) between nodes.
 ## Build and send off to your private image registry
 
 You can do the following to build and publish a Docker image based on DockPress
-to your private Docker registry:
+to your private Docker registry. The following uses my own internal URL for my
+own build and yours will be different:
 
 ```bash
 export registry_path=eu.gcr.io/dockerpress-379014/dockpress/dockpress:latest
-
 docker build -t dockpress . -f Dockerfile
-
 docker commit $(docker create dockpress) $registry_path
-
 docker push $registry_path
 ```
 

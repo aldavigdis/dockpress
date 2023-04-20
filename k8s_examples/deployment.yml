@@ -28,10 +28,6 @@ spec:
       - name: tmpfs
         emptyDir:
           sizeLimit: 5Gi
-      - name: dockpress-uploads-nfs-pvc
-        persistentVolumeClaim:
-          claimName: dockpress-uploads-nfs-pvc
-          readOnly: false
       - name: dockpress-wp-root-nfs-pvc
         persistentVolumeClaim:
           claimName: dockpress-wp-root-nfs-pvc
@@ -55,8 +51,6 @@ spec:
         volumeMounts:
         - name: tmpfs
           mountPath: /tmp
-        - name: dockpress-uploads-nfs-pvc
-          mountPath: /var/www/html/wp-content/uploads
         - name: dockpress-wp-root-nfs-pvc
           mountPath: /var/www/html
         - name: 'secret-credentials'

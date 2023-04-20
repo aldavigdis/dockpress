@@ -9,37 +9,7 @@ spec:
     storage: 1Mi
   nfs:
     path: /mnt/wp_root
-    server: '10.132.0.33'
-
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: dockpress-uploads-nfs-pv
-spec:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 1Mi
-  nfs:
-    path: /mnt/uploads
-    server: '10.132.0.33'
-
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: dockpress-uploads-nfs-pvc
-spec:
-  accessModes:
-  - ReadWriteMany
-  storageClassName: ""
-  volumeName: dockpress-uploads-nfs-pv
-  resources:
-    requests:
-      storage: 1Mi
+    server: '10.132.0.5'
 
 ---
 

@@ -216,7 +216,9 @@ spec:
 
 # Create a GKE managed ingress services
 #
-# This one uses
+# This one combines the certificate, frontend config and service above to create
+# a publicly available ingress. Remember that you are supposed to reserve an IP
+# address as well before running this.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

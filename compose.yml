@@ -1,0 +1,21 @@
+services:
+  dockpress:
+    image: dockpress
+    volumes:
+      - ./secrets:/secrets
+    ports:
+      - 80:80
+  mariadb:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      - MARIADB_DATABASE=wordpress
+      - MARIADB_USER=wordpress
+      - MARIADB_PASSWORD=password
+      - MARIADB_ROOT_PASSWORD=password
+  memcached:
+    image: memcached
+    ports:
+      - 11211:11211

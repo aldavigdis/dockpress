@@ -49,18 +49,18 @@ then
     wp config set DISALLOW_FILE_EDIT true --raw --allow-root
     wp config set WP_AUTO_UPDATE_CORE false --raw --allow-root
 
-    if [ $WP_DEBUG ]
+    if [ "$WP_DEBUG" ]
     then
         wp config set WP_DEBUG true --raw --allow-root
         wp config set WP_DEBUG_DISPLAY false --raw --allow-root
     fi
 
-    if [ $WP_SCRIPT_DEBUG ]
+    if [ "$WP_SCRIPT_DEBUG" ]
     then
         wp config set SCRIPT_DEBUG false --raw --allow-root
     fi
 
-    if [ -v $WP_MEMORY_LIMIT ]
+    if [ "$WP_MEMORY_LIMIT" ]
     then
         wp config set WP_MEMORY_LIMIT "$WP_MEMORY_LIMIT" --allow-root
         wp config set WP_MAX_MEMORY_LIMIT "$WP_MEMORY_LIMIT" --allow-root
@@ -69,54 +69,62 @@ then
         wp config set WP_MAX_MEMORY_LIMIT "ini_get( 'memory_limit' )" --raw --allow-root
     fi
 
-    if [ $DISABLE_WP_CRON ]
+    if [ "$DISABLE_WP_CRON" ]
     then
         wp config set DISABLE_WP_CRON true --allow-root
     fi
 
-    if [ $WP_UPLOADS_URL ]
+    if [ "$WP_UPLOADS_URL" ]
     then
         wp config set UPLOADS_URL "$WP_UPLOADS_URL" --allow-root
     fi
 
     # Enable Memcached object storage
-    export MEMCACHED_HOST=$(jq -r '.memcached_servers[0]' /secrets/credentials.json)
-    if [ $MEMCACHED_HOST ]
+    memcached_host=$(jq -r '.memcached_servers[0]' /secrets/credentials.json)
+    if [ "$memcached_host" ]
     then
         sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php
         curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached/trunk/object-cache.php > ./wp-content/object-cache.php
-        chmod $FILE_MODE ./wp-content/object-cache.php
-        chown $FILE_OWNER ./wp-content/object-cache.php
+        if [ "$FILE_MODE" ]
+        then
+            chmod "$FILE_MODE" ./wp-content/object-cache.php
+        fi
+        if [ "$FILE_OWNER" ]
+        then
+            chown "$FILE_OWNER" ./wp-content/object-cache.php
+        fi
     fi
 
-    if [ $WP_CONTENT_URL ]
+    if [ "$WP_CONTENT_URL" ]
     then
         wp config set WP_CONTENT_URL "$WP_CONTENT_URL" --allow-root
     fi
+fi
 
-    if [ $WP_THEME_INSTALL ]
-    then
-        wp theme install "$WP_THEME_INSTALL" --allow-root
-    fi
+wp core install --url="localhost" --title="DockPress Site" --admin_user="admin" --admin_password="password" --admin_email="root@example.com" --skip-email --allow-root
 
-    if [ $WP_THEME_ACTIVATE ]
-    then
-        wp theme activate "$WP_THEME_ACTIVATE" --allow-root
-    fi
+if [ "$WP_THEME_INSTALL" ]
+then
+    wp theme install "$WP_THEME_INSTALL" --allow-root
+fi
 
-    if [ $WP_PLUGIN_INSTALL ]
-    then
-        wp plugin install "$WP_PLUGIN_INSTALL" --allow-root
-    fi
+if [ "$WP_THEME_ACTIVATE" ]
+then
+    wp theme activate "$WP_THEME_ACTIVATE" --allow-root
+fi
 
-    if [ $WP_PLUGIN_ACTIVATE ]
-    then
-        wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
-    fi
+if [ "$WP_PLUGIN_INSTALL" ]
+then
+    wp plugin install "$WP_PLUGIN_INSTALL" --allow-root
+fi
+
+if [ "$WP_PLUGIN_ACTIVATE" ]
+then
+    wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
 fi
 
 # Remove crapware plugins from the WordPress installation
-if [ $REMOVE_CRAP_PLUGINS ]
+if [ "$REMOVE_CRAP_PLUGINS" ]
 then
     rm -rf wp-content/plugins/akismet/
     rm -rf wp-content/plugins/hello.php
@@ -126,5 +134,4 @@ if [ ! -d wp-content/uploads ]
 then
     echo "📁 Creating uploads directory"
     mkdir wp-content/uploads
-    chmod a+rw wp-content/uploads
 fi

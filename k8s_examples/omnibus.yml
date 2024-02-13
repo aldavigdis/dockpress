@@ -48,7 +48,7 @@ spec:
     storage: 1Mi
   nfs:
     path: /mnt/wp_root
-    server: '10.132.0.33'
+    server: '10.132.0.5'
 
 ---
 
@@ -76,29 +76,28 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysecret
+  name: credentials
 type: Opaque
 stringData:
   credentials.json: |
     {
-        "mysql_server":       "10.132.0.10:3306",
-        "mysql_db":           "wordpress",
-        "mysql_user":         "root",
-        "mysql_password":     "A9YwMzvGsbSYa8sYMMRBQuWr",
-        "new_relic_app_name": "",
-        "new_relic_key":      "",
-        "memcached_servers":  ["10.123.81.131:11211"],
-        "memcached_key_salt": "ciVWNmAjdnKO5SUkEoUI",
-        "auth_key":          "SuuPyW6VmNCHtUIyMjj9",
-        "secure_auth_key":   "oEZl3jIFUOdgAfEpjtPE",
-        "logged_in_key":     "HnCiub8gPhoxs8gFWtuA",
-        "nonce_key":         "GSfL7q0E7f1VWQzwvIv5",
-        "auth_salt":         "YrdqeWT3dfcCv46yY19H",
-        "secure_auth_salt":  "sZ3vthTmfp0U60vGZjRX",
-        "logged_in_salt":    "kToEN1cJe4aKDOq0iItf",
-        "nonce_salt":        "uG1u4lyr3xXOKCY1cWih"
-    }
+      "mysql_server":       "10.123.80.22:3306",
+      "mysql_db":           "wordpress",
+      "mysql_user":         "root",
+      "mysql_password":     "A9YwMzvGsbSYa8sYMMRBQuWr",
 
+      "memcached_servers":  ["10.132.0.5:11211"],
+      "memcached_key_salt": "lkcjmKLshZhiloMIMpLX",
+
+      "auth_key":         "mwK~G1wPb&.+1|g,5<85Y[~mYaKL$Pr.-8lqRtR)11/NKQ8ZO}uUMYc7y,N]774m",
+      "secure_auth_key":  "}2M;W-MIH^c-Dh}BUJh5/<JQ2|>z=b-kpnK--s@gXy(swW;3OA[/g|)/WL7( C10",
+      "logged_in_key":    "YG%ew+S;[c7>Up=r0FA{e ~!O%* 3T`li+{!]EbcQhk+-}j^Ae#bbUkZteFEuvG<",
+      "nonce_key":        "=# |mwe[Ptg(cd!~+~gOy$N+z m&k&NzLEf-S%1(U-O|XOzJ_ELn*rRS;w(% v5>",
+      "auth_salt":        ">YF#wt$.0-.FN?JSF}k{tO.~+xy]J/]M5[482o $=ZU53vB-qM@.;[]C 3ySS;]^",
+      "secure_auth_salt": "58r->%:dvb{GP*CLIA@&qfgE6$$YC(~Wn[a#Vb~qWjwH7<?$h`_Vm-T^iO@bsRcW",
+      "logged_in_salt":   "Qb.T|:Zj~y3gd_C^h=_v9>[4;09XP]Z3j;i)pr:WJERf.:s36;8e.gjCP>9N{#H!",
+      "nonce_salt":       "2)lsWo/ID4ws{Jx}+_e M9c`a-BMMwPYIQ?Q555fb3pw[.~L6J|Z|eX_)g`E|Q#g"
+    }
 ---
 
 # Create a deployment for our Kubernetes cluster

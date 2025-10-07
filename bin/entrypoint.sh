@@ -16,4 +16,4 @@ then
 fi
 
 echo "🚀 Starting PHP-FPM and Nginx Web Server"
-php-fpm8.1 && nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
+php-fpm8.4 && nginx -c /etc/nginx/nginx.conf -g 'daemon off;'

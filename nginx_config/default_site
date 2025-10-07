@@ -27,7 +27,7 @@ server {
         fastcgi_param HTTPS $https_flag;
 
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
     }
 
 

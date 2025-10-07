@@ -1,13 +1,13 @@
 #!/bin/bash
 
 apt-get update
-apt-get remove php8.1-imagick -y
+apt-get remove php8.4-imagick -y
 apt-get install build-essential libtiff-dev zlib1g-dev libfontconfig-dev \
                 libfreetype-dev libgvc6 libheif-dev liblcms2-dev \
                 libopenjp2-7-dev liblqr-1-0-dev libopenexr-dev \
                 libpango1.0-dev libraw-dev libwmf-dev libxml2-dev \
                 libzip-dev libzstd-dev libdjvulibre-dev libraqm-dev \
-                libwebp-dev libltdl-dev php8.1-dev -y
+                libwebp-dev libltdl-dev php8.4-dev -y
 
 curl -s -L "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs1000/ghostscript-10.0.0.tar.gz" | tar -C /tmp -zx
 cd /tmp/ghostscript-* && ./configure CFLAGS=-O3 --prefix=/usr && make -j $(nproc) so && make soinstall
@@ -24,5 +24,5 @@ cd /tmp/imagick-* && phpize && ./configure CFLAGS=-O3 --with-imagick=/opt/local 
 rm -rf /tmp/imagick-*
 ldconfig
 
-echo "extension=imagick.so" > /etc/php/8.1/mods-available/imagick.ini
+echo "extension=imagick.so" > /etc/php/8.4/mods-available/imagick.ini
 phpenmod imagick

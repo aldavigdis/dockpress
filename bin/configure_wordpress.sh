@@ -49,6 +49,8 @@ then
     wp config set DISALLOW_FILE_EDIT true --raw --allow-root
     wp config set WP_AUTO_UPDATE_CORE false --raw --allow-root
 
+    wp config set FS_METHOD direct --allow-root
+
     if [ "$WP_DEBUG" ]
     then
         wp config set WP_DEBUG true --raw --allow-root
@@ -84,7 +86,11 @@ then
     if [ "$memcached_host" ]
     then
         sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php
-        curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached/trunk/object-cache.php > ./wp-content/object-cache.php
+        curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached-redux/trunk/object-cache.php > ./wp-content/object-cache.php
+
+        # Fixing a deprecation error in the object-cache drop-in
+        sed -i "/class WP_Object_Cache {/i #[AllowDynamicProperties]" ./wp-content/object-cache.php
+
         if [ "$FILE_MODE" ]
         then
             chmod "$FILE_MODE" ./wp-content/object-cache.php
@@ -118,16 +124,17 @@ then
     wp plugin install "$WP_PLUGIN_INSTALL" --allow-root
 fi
 
-if [ "$WP_PLUGIN_ACTIVATE" ]
-then
-    wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
-fi
-
 # Remove crapware plugins from the WordPress installation
 if [ "$REMOVE_CRAP_PLUGINS" ]
 then
     rm -rf wp-content/plugins/akismet/
     rm -rf wp-content/plugins/hello.php
+fi
+
+if [ "$WP_PLUGIN_ACTIVATE" ]
+then
+    wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
+    wp plugin activate "$WP_PLUGIN_ACTIVATE" --allow-root
 fi
 
 if [ ! -d wp-content/uploads ]

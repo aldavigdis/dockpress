@@ -20,5 +20,5 @@ then
         -e "s/newrelic.appname = \"PHP Application\"/newrelic.appname = \"${nr_app_name}\"/" \
         -e 's/;newrelic.daemon.app_connect_timeout =.*/newrelic.daemon.app_connect_timeout=15s/' \
         -e 's/;newrelic.daemon.start_timeout =.*/newrelic.daemon.start_timeout=5s/' \
-        /etc/php/8.1/fpm/conf.d/newrelic.ini
+        /etc/php/8.4/fpm/conf.d/newrelic.ini
 fi

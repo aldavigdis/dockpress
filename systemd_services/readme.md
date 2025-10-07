@@ -1,9 +1,9 @@
 ```bash
 apt-get update
-apt-get install less php inotify-tool php8.1 \
-                php8.1-mysql php8.1-curl php8.1-memcached php8.1-memcache \
-                php8.1-zip php8.1-xml php8.1-mbstring php8.1-imagick \
-                php8.1-redis php8.1-bc php8.1-intl php8.1-ssh2 \
+apt-get install less php inotify-tool php8.4 \
+                php8.4-mysql php8.4-curl php8.4-memcached php8.4-memcache \
+                php8.4-zip php8.4-xml php8.4-mbstring php8.4-imagick \
+                php8.4-redis php8.4-bc php8.4-intl php8.4-ssh2 \
                 mariadb-client
 useradd wp-services -r -m --shell=/bin/false --uid=699
 ```

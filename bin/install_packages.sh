@@ -10,7 +10,7 @@ apt-get install nginx php8.4-fpm php8.4 \
                 php8.4-mysql php8.4-curl php8.4-memcached php8.4-memcache \
                 php8.4-zip php8.4-xml php8.4-mbstring php8.4-imagick \
                 php8.4-redis php8.4-bc php8.4-intl php8.4-ssh2 \
-                mariadb-client curl locales jq less vim -y
+                mariadb-client curl locales jq less vim netcat-traditional -y
 
 rm -rf /var/lib/apt/lists/*
 localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8

@@ -8,6 +8,7 @@ then
     else
         wp core download --allow-root
     fi
+    wp_downloaded=true
 fi
 
 if [ ! -d wp-content/mu-plugins ]
@@ -22,6 +23,22 @@ if [ ! -f wp-config.php ] || [ $FORCE_WP_CONFIG ]
 then
     if [ -f wp-config.php ]; then rm wp-config.php; fi
     cp wp-config-sample.php wp-config.php
+
+    export mysql_server=$(jq -r '.mysql_server' /secrets/credentials.json)
+    export mysql_user=$(jq -r '.mysql_user' /secrets/credentials.json)
+    export mysql_password=$(jq -r '.mysql_password' /secrets/credentials.json)
+    export mysql_db=$(jq -r '.mysql_db' /secrets/credentials.json)
+
+    php -r "mysqli_connect( getenv('mysql_server'), getenv('mysql_user'), getenv('mysql_password'), getenv('mysql_db') );" 2> /dev/null
+    mariadb_check=$?
+
+    while [ $mariadb_check -ne 0 ]
+    do
+        echo "🔎 Waiting for an open MariaDB port."
+        sleep 2s;
+        php -r "mysqli_connect( getenv('mysql_server'), getenv('mysql_user'), getenv('mysql_password'), getenv('mysql_db') );" 2> /dev/null
+        mariadb_check=$?
+    done
 
     sed -i "/<?php/a \$credentials = json_decode( file_get_contents('/secrets/credentials.json') );" wp-config.php
 
@@ -107,7 +124,10 @@ then
     fi
 fi
 
-wp core install --url="localhost" --title="DockPress Site" --admin_user="admin" --admin_password="password" --admin_email="root@example.com" --skip-email --allow-root
+if "$wp_downloaded"
+then
+    wp core install --url="$WP_SITE_DOMAIN" --title="$WP_SITE_TITLE" --admin_user="admin" --admin_password="password" --admin_email="root@example.com" --skip-email --allow-root
+fi
 
 if [ "$WP_THEME_INSTALL" ]
 then

@@ -2,6 +2,9 @@ FROM ubuntu:noble
 
 EXPOSE 80
 
+ENV WP_SITE_DOMAIN='localhost'
+ENV WP_SITE_TITLE='DockPress Site'
+
 ENV NR_PHP_AGENT_URL='https://download.newrelic.com/php_agent/archive/12.1.0.26/newrelic-php5-12.1.0.26-linux.tar.gz'
 ENV GHOSTSCRIPT_URL='https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10060/ghostscript-10.06.0.tar.gz'
 

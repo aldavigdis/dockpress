@@ -6,6 +6,8 @@ bash /root/configure_php.sh
 echo "📊 Configuring New Relic"
 bash /root/install_new_relic.sh
 
+sleep 1m
+
 echo "🔧 Configuring WordPress"
 bash /root/configure_wordpress.sh
 

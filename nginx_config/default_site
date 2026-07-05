@@ -10,13 +10,17 @@ server {
     root /var/www/html;
     index index.html index.php
 
-    proxy_busy_buffers_size 1024k;
-    proxy_buffers 4 512k;
-    proxy_buffer_size 256k;
+    proxy_busy_buffers_size 2048k;
+    proxy_buffers 4 8192k;
+    proxy_buffer_size 2048k;
 
     client_max_body_size 384M;
-    fastcgi_read_timeout 30;
-    fastcgi_send_timeout 30;
+
+    fastcgi_buffers  16 128k;
+    fastcgi_buffer_size 512k;
+
+    fastcgi_read_timeout 120;
+    fastcgi_send_timeout 120;
 
     location / {
         try_files $uri $uri/ /index.php?q=$uri&$args;

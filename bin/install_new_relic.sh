@@ -4,8 +4,9 @@ nr_key=$(jq -r '.new_relic_key' /secrets/credentials.json)
 nr_app_name=$(jq -r '.new_relic_app_name' /secrets/credentials.json)
 
 # The installation will not happen unless the credentials and ENV variables are set
-if [ "$nr_key" ] && [ "${NR_APP_NAME}" ] && [ "$NR_PHP_AGENT_URL" ]
+if [ "$nr_key" ] && [ "$nr_app_name" ] && [ "$NR_PHP_AGENT_URL" ]
 then
+    echo "New Relic credtentials identified."
     curl -s -L ${NR_PHP_AGENT_URL} | tar -C /tmp -zx
 
     export NR_INSTALL_USE_CP_NOT_LN=1

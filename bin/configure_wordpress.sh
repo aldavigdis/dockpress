@@ -86,7 +86,7 @@ then
     if [ "$memcached_host" ]
     then
         sed -i "/Add any custom values between this line/a \$memcached_servers = array( 'default' => \$credentials->memcached_servers );" wp-config.php
-        curl -s https://plugins.trac.wordpress.org/export/HEAD/memcached-redux/trunk/object-cache.php > ./wp-content/object-cache.php
+        cp /root/memcached-redux/object-cache.php ./wp-content/object-cache.php
 
         # Fixing a deprecation error in the object-cache drop-in
         sed -i "/class WP_Object_Cache {/i #[AllowDynamicProperties]" ./wp-content/object-cache.php
@@ -107,7 +107,10 @@ then
     fi
 fi
 
-wp core install --url="localhost" --title="DockPress Site" --admin_user="admin" --admin_password="password" --admin_email="root@example.com" --skip-email --allow-root
+if $wp_downloaded
+then
+    wp core install --url="$WP_SITE_DOMAIN" --title="$WP_SITE_TITLE" --admin_user="admin" --admin_password="password" --admin_email="root@example.com" --skip-email --allow-root
+fi
 
 if [ "$WP_THEME_INSTALL" ]
 then

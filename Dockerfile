@@ -13,9 +13,9 @@ ENV WP_MEMORY_LIMIT='448M'
 ENV PHP_UPLOAD_MAX_FILESIZE='256M'
 ENV PHP_POST_MAX_SIZE='384M'
 ENV PHP_MEMORY_LIMIT='512M'
-ENV PHP_MAX_EXECUTION_TIME='240'
+ENV PHP_MAX_EXECUTION_TIME='90'
 
-ENV PHP_ERROR_REPORTING='E_ALL \& ~E_STRICT'
+ENV PHP_ERROR_REPORTING='E_ALL \& ~E_NOTICE'
 ENV WP_DEBUG=true
 
 # ENV WP_UPLOADS_URL 'https://cdn.example.net'
@@ -59,6 +59,7 @@ WORKDIR /var/www/html
 # COPY wordpress_site/ .
 
 COPY mu-plugins/ /root/mu-plugins/
+COPY memcached-redux/ /root/memcached-redux/
 
 COPY bin/* /root/
 
